@@ -2,7 +2,7 @@ import { config } from 'dotenv'
 
 config()
 
-import { Client, Message } from 'discord.js'
+import Discord, { Client, Message } from 'discord.js'
 import { prefix } from './config.json'
 import fetch from 'node-fetch'
 
@@ -19,11 +19,21 @@ client.on('message', async (message: Message) => {
         const data = await response.json()
         const secondResponse = await fetch('https://api.github.com/users/' + user + '/repos?per_page=6')
         const repositories = await secondResponse.json();
-        message.channel.send(data.avatar_url);
-        message.channel.send(data.login);
+
+        const embed = new Discord.MessageEmbed()
+        .setColor('#0099ff')
+        .setTitle('GITHUB PROFILE')
+        .setAuthor(data.login, data.avatar_url)
+        .setImage(data.avatar_url)
+
         for(let i = 0; i<repositories.length; i++){
-            message.channel.send(repositories[i].full_name)
+            embed.addFields(
+                {name: 'Repositorie', value: repositories[i].full_name}
+            )
         }
+
+        message.channel.send(embed);
+        
     }
 })
 
